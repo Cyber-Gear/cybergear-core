@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.12;
 
-import './IPancakeERC20.sol';
+import './IJoeERC20.sol';
 
-interface IPancakePair is IPancakeERC20{
+interface IJoePair is IJoeERC20{
     function MINIMUM_LIQUIDITY() external pure returns (uint);
     function factory() external view returns (address);
     function token0() external view returns (address);

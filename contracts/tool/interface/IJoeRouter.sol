@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.12;
 
-interface IPancakeRouter {
+interface IJoeRouter {
     function addLiquidity(
         address tokenA,
         address tokenB,
