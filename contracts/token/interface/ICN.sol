@@ -12,7 +12,7 @@ abstract contract ICN is IERC721Enumerable {
     mapping(uint256 => mapping(string => uint256)) public data;
     mapping(uint256 => mapping(string => uint256[])) public datas;
 
-    function spawnCn(uint256[] memory attr, address to)
+    function spawnCn(uint256 hero, address to)
         external
         virtual
         returns (uint256);

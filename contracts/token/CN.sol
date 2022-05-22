@@ -23,7 +23,7 @@ contract CN is ERC721Enumerable, AccessControlEnumerable {
     mapping(uint256 => mapping(string => uint256[])) public datas;
 
     event SetBaseURI(string uri);
-    event SpawnCn(address indexed to, uint256 cnId, uint256[] attr);
+    event SpawnCn(address indexed to, uint256 cnId, uint256 hero);
     event SetData(uint256 indexed cnId, string slot, uint256 data);
     event SetDatas(uint256 indexed cnId, string slot, uint256[] datas);
 
@@ -47,18 +47,18 @@ contract CN is ERC721Enumerable, AccessControlEnumerable {
     /**
      * @dev Spawn a New Cn to an Address
      */
-    function spawnCn(uint256[] memory attr, address to)
+    function spawnCn(uint256 hero, address to)
         external
         onlyRole(SPAWNER_ROLE)
         returns (uint256)
     {
         uint256 newCnId = totalSupply();
 
-        datas[newCnId]["attr"] = attr;
+        data[newCnId]["hero"] = hero;
 
         _safeMint(to, newCnId);
 
-        emit SpawnCn(to, newCnId, attr);
+        emit SpawnCn(to, newCnId, hero);
 
         return newCnId;
     }
@@ -161,8 +161,6 @@ contract CN is ERC721Enumerable, AccessControlEnumerable {
             "ERC721Metadata: URI query for nonexistent token"
         );
 
-        uint256[] memory attr = datas[tokenId]["attr"];
-
         return
             bytes(baseURI).length > 0
                 ? string(
@@ -170,9 +168,7 @@ contract CN is ERC721Enumerable, AccessControlEnumerable {
                         baseURI,
                         tokenId.toString(),
                         "-",
-                        attr[0].toString(),
-                        "-",
-                        attr[1].toString()
+                        data[tokenId]["hero"].toString()
                     )
                 )
                 : "";
