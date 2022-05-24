@@ -12,10 +12,10 @@ abstract contract ICS is IERC721Enumerable {
     mapping(uint256 => mapping(string => uint256)) public data;
     mapping(uint256 => mapping(string => uint256[])) public datas;
 
-    function spawnCs(uint256 hero, address to)
+    function spawnCss(uint256[] memory heros, address to)
         external
         virtual
-        returns (uint256);
+        returns (uint256[] memory);
 
     function setData(
         uint256 csId,

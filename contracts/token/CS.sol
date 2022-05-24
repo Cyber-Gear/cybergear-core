@@ -51,7 +51,7 @@ contract CS is ERC721Enumerable, AccessControlEnumerable, ReentrancyGuard {
     event SetBaseURI(string uri);
     event SetAddrs(address kaiAddr, address cnAddr);
     event SetPrices(uint256[15] prices);
-    event SpawnCs(address indexed to, uint256 csId, uint256 hero);
+    event SpawnCss(address indexed to, uint256[] csIds, uint256[] heros);
     event SetData(uint256 indexed csId, string slot, uint256 data);
     event SetDatas(uint256 indexed csId, string slot, uint256[] datas);
     event Craft(
@@ -104,22 +104,25 @@ contract CS is ERC721Enumerable, AccessControlEnumerable, ReentrancyGuard {
     }
 
     /**
-     * @dev Spawn a New Cs to an Address
+     * @dev Spawn New Css to an Address
      */
-    function spawnCs(uint256 hero, address to)
+    function spawnCss(uint256[] memory heros, address to)
         external
         onlyRole(SPAWNER_ROLE)
-        returns (uint256)
+        returns (uint256[] memory)
     {
-        uint256 newCsId = totalSupply();
+        uint256[] memory newCsIds = new uint256[](heros.length);
+        for (uint256 i = 0; i < heros.length; i++) {
+            newCsIds[i] = totalSupply();
 
-        data[newCsId]["hero"] = hero;
+            data[newCsIds[i]]["hero"] = heros[i];
 
-        _safeMint(to, newCsId);
+            _safeMint(to, newCsIds[i]);
+        }
 
-        emit SpawnCs(to, newCsId, hero);
+        emit SpawnCss(to, newCsIds, heros);
 
-        return newCsId;
+        return newCsIds;
     }
 
     /**
