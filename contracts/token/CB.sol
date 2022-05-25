@@ -8,11 +8,12 @@ import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
+import "../tool/interface/IVRFOracleOraichain.sol";
 import "../token/interface/ICN.sol";
 
 /**
  * @title Cyber Gear Box
- * @author ISEKAI-TEAM
+ * @author FUNTOPIA-TEAM
  * @notice Contract to supply CB
  */
 contract CB is ERC721Enumerable, AccessControlEnumerable, ReentrancyGuard {
@@ -20,8 +21,11 @@ contract CB is ERC721Enumerable, AccessControlEnumerable, ReentrancyGuard {
     using EnumerableSet for EnumerableSet.AddressSet;
     using Strings for uint256;
 
-    mapping(uint256 => address) public requestIdToUser;
-    mapping(uint256 => uint256[]) public requestIdToTypes;
+    // testnet: 0x82174e5d7f2a4cCbCC9D14b3930C8935541e6222
+    address public oracle = 0x6b5866f4B9832bFF3d8aD81B1151a37393f6B7D5;
+
+    mapping(bytes32 => address) public reqIdToUser;
+    mapping(bytes32 => uint256[]) public reqIdToTypes;
 
     bytes32 public constant MANAGER_ROLE = keccak256("MANAGER_ROLE");
 
@@ -171,10 +175,11 @@ contract CB is ERC721Enumerable, AccessControlEnumerable, ReentrancyGuard {
     /**
      * @dev Users buy the boxes
      */
-    function buyBoxes(
-        uint256 amount,
-        uint256 boxType
-    ) external payable nonReentrant {
+    function buyBoxes(uint256 amount, uint256 boxType)
+        external
+        payable
+        nonReentrant
+    {
         require(amount > 0, "Amount must > 0");
         require(
             getUserHourlyBoxesLeftSupply(
@@ -249,9 +254,16 @@ contract CB is ERC721Enumerable, AccessControlEnumerable, ReentrancyGuard {
             );
         }
 
-        uint256 requestId;
-        requestIdToUser[requestId] = msg.sender;
-        requestIdToTypes[requestId] = boxTypes;
+        uint256 fee = IVRFOracleOraichain(oracle).getFee();
+        bytes memory data = abi.encode(
+            address(this),
+            this.fulfillRandomness.selector
+        );
+        bytes32 reqId = IVRFOracleOraichain(oracle).randomnessRequest{
+            value: fee
+        }(cbIds[0] + cbIds.length + block.number, data);
+        reqIdToUser[reqId] = msg.sender;
+        reqIdToTypes[reqId] = boxTypes;
 
         emit OpenBoxes(msg.sender, cbIds.length, cbIds, boxTypes);
     }
@@ -321,6 +333,26 @@ contract CB is ERC721Enumerable, AccessControlEnumerable, ReentrancyGuard {
             userHourlyBoxesLength[user][boxType][timestamp / 1 hours];
     }
 
+    function random(uint256 _oraiNumber, uint256 _weight)
+        public
+        view
+        returns (uint256)
+    {
+        return
+            uint256(
+                keccak256(
+                    abi.encodePacked(
+                        _oraiNumber,
+                        block.difficulty,
+                        block.timestamp,
+                        block.coinbase,
+                        block.number,
+                        msg.sender
+                    )
+                )
+            ) % (_weight);
+    }
+
     /**
      * @dev Returns the Uniform Resource Identifier (URI) for a token ID
      */
@@ -363,7 +395,7 @@ contract CB is ERC721Enumerable, AccessControlEnumerable, ReentrancyGuard {
     /**
      * @dev Get Level
      */
-    function getLevel(uint256[] memory array, uint256 random)
+    function getLevel(uint256[] memory array, uint256 _random)
         public
         pure
         returns (uint256)
@@ -372,7 +404,7 @@ contract CB is ERC721Enumerable, AccessControlEnumerable, ReentrancyGuard {
         uint256 level;
         for (uint256 i = 0; i < array.length; i++) {
             accProbability += array[i];
-            if (random < accProbability) {
+            if (_random < accProbability) {
                 level = i;
                 break;
             }
@@ -383,20 +415,22 @@ contract CB is ERC721Enumerable, AccessControlEnumerable, ReentrancyGuard {
     /**
      * @dev Spawn CN to User when get Randomness Response
      */
-    function fulfillRandomWords(uint256 requestId, uint256[] memory randomWords)
-        internal
+    function fulfillRandomness(bytes32 _reqId, uint256 oraichainRandomness)
+        public
     {
-        uint256[] memory cnIds = new uint256[](randomWords.length);
+        require(msg.sender == oracle, "Caller must is oracle");
 
-        for (uint256 i = 0; i < randomWords.length; i++) {
+        uint256[] memory cnIds = new uint256[](reqIdToTypes[_reqId].length);
+
+        for (uint256 i = 0; i < cnIds.length; i++) {
             uint256 hero = getLevel(
-                heroProbabilities[requestIdToTypes[requestId][i]],
-                randomWords[i] % 1e4
+                heroProbabilities[reqIdToTypes[_reqId][i]],
+                oraichainRandomness = random(oraichainRandomness, 1e4)
             );
 
-            cnIds[i] = cn.spawnCn(hero, requestIdToUser[requestId]);
+            cnIds[i] = cn.spawnCn(hero, reqIdToUser[_reqId]);
         }
 
-        emit SpawnCns(requestIdToUser[requestId], randomWords.length, cnIds);
+        emit SpawnCns(reqIdToUser[_reqId], cnIds.length, cnIds);
     }
 }

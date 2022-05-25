@@ -4,10 +4,10 @@ async function main() {
   const constructorArgs: any[] = [
     "",
   ];
-  const factory = await ethers.getContractFactory("KAI");
+  const factory = await ethers.getContractFactory("FUN");
   const contract = await factory.deploy(...constructorArgs);
   await contract.deployed();
-  console.log("KAI contract successfully deployed:", contract.address)
+  console.log("FUN contract successfully deployed:", contract.address)
   await hre.run("verify:verify", {
     address: contract.address,
     constructorArguments: constructorArgs

@@ -1,6 +1,6 @@
 {
-  "name": "isekai-core",
-  "version": "1.0.2",
+  "name": "funtopia-core",
+  "version": "1.0.3",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -10,21 +10,21 @@
     "build": "npm run clean && npm run compile",
     "coverage": "npm run build && npx hardhat coverage --temp artifacts --network coverage",
     "deploy": "npm run build && npx hardhat run --network testnet scripts/deploy.ts",
-    "flatten": "npx hardhat flatten ./contracts/token/CN.sol > ./flatten/token/CN.sol"
+    "flatten": "npx hardhat flatten ./contracts/pool/Market.sol > ./flatten/pool/Market.sol"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/isekaifans/isekai-core.git"
+    "url": "git+https://github.com/fun-topia/funtopia-core.git"
   },
   "files": [
     "typechain-types/"
   ],
-  "author": "ISEKAI-TEAM",
+  "author": "FUNTOPIA-TEAM",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/isekaifans/isekai-core/issues"
+    "url": "https://github.com/fun-topia/funtopia-core/issues"
   },
-  "homepage": "https://github.com/isekaifans/isekai-core#readme",
+  "homepage": "https://github.com/fun-topia/funtopia-core#readme",
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.5",
     "@nomiclabs/hardhat-etherscan": "^3.0.3",

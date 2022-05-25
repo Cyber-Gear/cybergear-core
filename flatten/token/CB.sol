@@ -1,5 +1,418 @@
 // Sources flattened with hardhat v2.9.6 https://hardhat.org
 
+// File @openzeppelin/contracts/token/ERC20/IERC20.sol@v4.6.0
+
+// SPDX-License-Identifier: MIT
+// OpenZeppelin Contracts (last updated v4.6.0) (token/ERC20/IERC20.sol)
+
+pragma solidity ^0.8.0;
+
+/**
+ * @dev Interface of the ERC20 standard as defined in the EIP.
+ */
+interface IERC20 {
+    /**
+     * @dev Emitted when `value` tokens are moved from one account (`from`) to
+     * another (`to`).
+     *
+     * Note that `value` may be zero.
+     */
+    event Transfer(address indexed from, address indexed to, uint256 value);
+
+    /**
+     * @dev Emitted when the allowance of a `spender` for an `owner` is set by
+     * a call to {approve}. `value` is the new allowance.
+     */
+    event Approval(address indexed owner, address indexed spender, uint256 value);
+
+    /**
+     * @dev Returns the amount of tokens in existence.
+     */
+    function totalSupply() external view returns (uint256);
+
+    /**
+     * @dev Returns the amount of tokens owned by `account`.
+     */
+    function balanceOf(address account) external view returns (uint256);
+
+    /**
+     * @dev Moves `amount` tokens from the caller's account to `to`.
+     *
+     * Returns a boolean value indicating whether the operation succeeded.
+     *
+     * Emits a {Transfer} event.
+     */
+    function transfer(address to, uint256 amount) external returns (bool);
+
+    /**
+     * @dev Returns the remaining number of tokens that `spender` will be
+     * allowed to spend on behalf of `owner` through {transferFrom}. This is
+     * zero by default.
+     *
+     * This value changes when {approve} or {transferFrom} are called.
+     */
+    function allowance(address owner, address spender) external view returns (uint256);
+
+    /**
+     * @dev Sets `amount` as the allowance of `spender` over the caller's tokens.
+     *
+     * Returns a boolean value indicating whether the operation succeeded.
+     *
+     * IMPORTANT: Beware that changing an allowance with this method brings the risk
+     * that someone may use both the old and the new allowance by unfortunate
+     * transaction ordering. One possible solution to mitigate this race
+     * condition is to first reduce the spender's allowance to 0 and set the
+     * desired value afterwards:
+     * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
+     *
+     * Emits an {Approval} event.
+     */
+    function approve(address spender, uint256 amount) external returns (bool);
+
+    /**
+     * @dev Moves `amount` tokens from `from` to `to` using the
+     * allowance mechanism. `amount` is then deducted from the caller's
+     * allowance.
+     *
+     * Returns a boolean value indicating whether the operation succeeded.
+     *
+     * Emits a {Transfer} event.
+     */
+    function transferFrom(
+        address from,
+        address to,
+        uint256 amount
+    ) external returns (bool);
+}
+
+
+// File @openzeppelin/contracts/utils/Address.sol@v4.6.0
+
+// SPDX-License-Identifier: MIT
+// OpenZeppelin Contracts (last updated v4.5.0) (utils/Address.sol)
+
+pragma solidity ^0.8.1;
+
+/**
+ * @dev Collection of functions related to the address type
+ */
+library Address {
+    /**
+     * @dev Returns true if `account` is a contract.
+     *
+     * [IMPORTANT]
+     * ====
+     * It is unsafe to assume that an address for which this function returns
+     * false is an externally-owned account (EOA) and not a contract.
+     *
+     * Among others, `isContract` will return false for the following
+     * types of addresses:
+     *
+     *  - an externally-owned account
+     *  - a contract in construction
+     *  - an address where a contract will be created
+     *  - an address where a contract lived, but was destroyed
+     * ====
+     *
+     * [IMPORTANT]
+     * ====
+     * You shouldn't rely on `isContract` to protect against flash loan attacks!
+     *
+     * Preventing calls from contracts is highly discouraged. It breaks composability, breaks support for smart wallets
+     * like Gnosis Safe, and does not provide security since it can be circumvented by calling from a contract
+     * constructor.
+     * ====
+     */
+    function isContract(address account) internal view returns (bool) {
+        // This method relies on extcodesize/address.code.length, which returns 0
+        // for contracts in construction, since the code is only stored at the end
+        // of the constructor execution.
+
+        return account.code.length > 0;
+    }
+
+    /**
+     * @dev Replacement for Solidity's `transfer`: sends `amount` wei to
+     * `recipient`, forwarding all available gas and reverting on errors.
+     *
+     * https://eips.ethereum.org/EIPS/eip-1884[EIP1884] increases the gas cost
+     * of certain opcodes, possibly making contracts go over the 2300 gas limit
+     * imposed by `transfer`, making them unable to receive funds via
+     * `transfer`. {sendValue} removes this limitation.
+     *
+     * https://diligence.consensys.net/posts/2019/09/stop-using-soliditys-transfer-now/[Learn more].
+     *
+     * IMPORTANT: because control is transferred to `recipient`, care must be
+     * taken to not create reentrancy vulnerabilities. Consider using
+     * {ReentrancyGuard} or the
+     * https://solidity.readthedocs.io/en/v0.5.11/security-considerations.html#use-the-checks-effects-interactions-pattern[checks-effects-interactions pattern].
+     */
+    function sendValue(address payable recipient, uint256 amount) internal {
+        require(address(this).balance >= amount, "Address: insufficient balance");
+
+        (bool success, ) = recipient.call{value: amount}("");
+        require(success, "Address: unable to send value, recipient may have reverted");
+    }
+
+    /**
+     * @dev Performs a Solidity function call using a low level `call`. A
+     * plain `call` is an unsafe replacement for a function call: use this
+     * function instead.
+     *
+     * If `target` reverts with a revert reason, it is bubbled up by this
+     * function (like regular Solidity function calls).
+     *
+     * Returns the raw returned data. To convert to the expected return value,
+     * use https://solidity.readthedocs.io/en/latest/units-and-global-variables.html?highlight=abi.decode#abi-encoding-and-decoding-functions[`abi.decode`].
+     *
+     * Requirements:
+     *
+     * - `target` must be a contract.
+     * - calling `target` with `data` must not revert.
+     *
+     * _Available since v3.1._
+     */
+    function functionCall(address target, bytes memory data) internal returns (bytes memory) {
+        return functionCall(target, data, "Address: low-level call failed");
+    }
+
+    /**
+     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`], but with
+     * `errorMessage` as a fallback revert reason when `target` reverts.
+     *
+     * _Available since v3.1._
+     */
+    function functionCall(
+        address target,
+        bytes memory data,
+        string memory errorMessage
+    ) internal returns (bytes memory) {
+        return functionCallWithValue(target, data, 0, errorMessage);
+    }
+
+    /**
+     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],
+     * but also transferring `value` wei to `target`.
+     *
+     * Requirements:
+     *
+     * - the calling contract must have an ETH balance of at least `value`.
+     * - the called Solidity function must be `payable`.
+     *
+     * _Available since v3.1._
+     */
+    function functionCallWithValue(
+        address target,
+        bytes memory data,
+        uint256 value
+    ) internal returns (bytes memory) {
+        return functionCallWithValue(target, data, value, "Address: low-level call with value failed");
+    }
+
+    /**
+     * @dev Same as {xref-Address-functionCallWithValue-address-bytes-uint256-}[`functionCallWithValue`], but
+     * with `errorMessage` as a fallback revert reason when `target` reverts.
+     *
+     * _Available since v3.1._
+     */
+    function functionCallWithValue(
+        address target,
+        bytes memory data,
+        uint256 value,
+        string memory errorMessage
+    ) internal returns (bytes memory) {
+        require(address(this).balance >= value, "Address: insufficient balance for call");
+        require(isContract(target), "Address: call to non-contract");
+
+        (bool success, bytes memory returndata) = target.call{value: value}(data);
+        return verifyCallResult(success, returndata, errorMessage);
+    }
+
+    /**
+     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],
+     * but performing a static call.
+     *
+     * _Available since v3.3._
+     */
+    function functionStaticCall(address target, bytes memory data) internal view returns (bytes memory) {
+        return functionStaticCall(target, data, "Address: low-level static call failed");
+    }
+
+    /**
+     * @dev Same as {xref-Address-functionCall-address-bytes-string-}[`functionCall`],
+     * but performing a static call.
+     *
+     * _Available since v3.3._
+     */
+    function functionStaticCall(
+        address target,
+        bytes memory data,
+        string memory errorMessage
+    ) internal view returns (bytes memory) {
+        require(isContract(target), "Address: static call to non-contract");
+
+        (bool success, bytes memory returndata) = target.staticcall(data);
+        return verifyCallResult(success, returndata, errorMessage);
+    }
+
+    /**
+     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],
+     * but performing a delegate call.
+     *
+     * _Available since v3.4._
+     */
+    function functionDelegateCall(address target, bytes memory data) internal returns (bytes memory) {
+        return functionDelegateCall(target, data, "Address: low-level delegate call failed");
+    }
+
+    /**
+     * @dev Same as {xref-Address-functionCall-address-bytes-string-}[`functionCall`],
+     * but performing a delegate call.
+     *
+     * _Available since v3.4._
+     */
+    function functionDelegateCall(
+        address target,
+        bytes memory data,
+        string memory errorMessage
+    ) internal returns (bytes memory) {
+        require(isContract(target), "Address: delegate call to non-contract");
+
+        (bool success, bytes memory returndata) = target.delegatecall(data);
+        return verifyCallResult(success, returndata, errorMessage);
+    }
+
+    /**
+     * @dev Tool to verifies that a low level call was successful, and revert if it wasn't, either by bubbling the
+     * revert reason using the provided one.
+     *
+     * _Available since v4.3._
+     */
+    function verifyCallResult(
+        bool success,
+        bytes memory returndata,
+        string memory errorMessage
+    ) internal pure returns (bytes memory) {
+        if (success) {
+            return returndata;
+        } else {
+            // Look for revert reason and bubble it up if present
+            if (returndata.length > 0) {
+                // The easiest way to bubble the revert reason is using memory via assembly
+
+                assembly {
+                    let returndata_size := mload(returndata)
+                    revert(add(32, returndata), returndata_size)
+                }
+            } else {
+                revert(errorMessage);
+            }
+        }
+    }
+}
+
+
+// File @openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol@v4.6.0
+
+// SPDX-License-Identifier: MIT
+// OpenZeppelin Contracts v4.4.1 (token/ERC20/utils/SafeERC20.sol)
+
+pragma solidity ^0.8.0;
+
+
+/**
+ * @title SafeERC20
+ * @dev Wrappers around ERC20 operations that throw on failure (when the token
+ * contract returns false). Tokens that return no value (and instead revert or
+ * throw on failure) are also supported, non-reverting calls are assumed to be
+ * successful.
+ * To use this library you can add a `using SafeERC20 for IERC20;` statement to your contract,
+ * which allows you to call the safe operations as `token.safeTransfer(...)`, etc.
+ */
+library SafeERC20 {
+    using Address for address;
+
+    function safeTransfer(
+        IERC20 token,
+        address to,
+        uint256 value
+    ) internal {
+        _callOptionalReturn(token, abi.encodeWithSelector(token.transfer.selector, to, value));
+    }
+
+    function safeTransferFrom(
+        IERC20 token,
+        address from,
+        address to,
+        uint256 value
+    ) internal {
+        _callOptionalReturn(token, abi.encodeWithSelector(token.transferFrom.selector, from, to, value));
+    }
+
+    /**
+     * @dev Deprecated. This function has issues similar to the ones found in
+     * {IERC20-approve}, and its usage is discouraged.
+     *
+     * Whenever possible, use {safeIncreaseAllowance} and
+     * {safeDecreaseAllowance} instead.
+     */
+    function safeApprove(
+        IERC20 token,
+        address spender,
+        uint256 value
+    ) internal {
+        // safeApprove should only be called when setting an initial allowance,
+        // or when resetting it to zero. To increase and decrease it, use
+        // 'safeIncreaseAllowance' and 'safeDecreaseAllowance'
+        require(
+            (value == 0) || (token.allowance(address(this), spender) == 0),
+            "SafeERC20: approve from non-zero to non-zero allowance"
+        );
+        _callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, value));
+    }
+
+    function safeIncreaseAllowance(
+        IERC20 token,
+        address spender,
+        uint256 value
+    ) internal {
+        uint256 newAllowance = token.allowance(address(this), spender) + value;
+        _callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, newAllowance));
+    }
+
+    function safeDecreaseAllowance(
+        IERC20 token,
+        address spender,
+        uint256 value
+    ) internal {
+        unchecked {
+            uint256 oldAllowance = token.allowance(address(this), spender);
+            require(oldAllowance >= value, "SafeERC20: decreased allowance below zero");
+            uint256 newAllowance = oldAllowance - value;
+            _callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, newAllowance));
+        }
+    }
+
+    /**
+     * @dev Imitates a Solidity high-level call (i.e. a regular function call to a contract), relaxing the requirement
+     * on the return value: the return value is optional (but if data is returned, it must not be false).
+     * @param token The token targeted by the call.
+     * @param data The call data (encoded using abi.encode or one of its variants).
+     */
+    function _callOptionalReturn(IERC20 token, bytes memory data) private {
+        // We need to perform a low level call here, to bypass Solidity's return data size checking mechanism, since
+        // we're implementing it ourselves. We use {Address.functionCall} to perform this call, which verifies that
+        // the target address contains contract code and also asserts for success in the low-level call.
+
+        bytes memory returndata = address(token).functionCall(data, "SafeERC20: low-level call failed");
+        if (returndata.length > 0) {
+            // Return data is optional
+            require(abi.decode(returndata, (bool)), "SafeERC20: ERC20 operation did not succeed");
+        }
+    }
+}
+
+
 // File @openzeppelin/contracts/utils/introspection/IERC165.sol@v4.6.0
 
 // SPDX-License-Identifier: MIT
@@ -231,232 +644,6 @@ interface IERC721Metadata is IERC721 {
      * @dev Returns the Uniform Resource Identifier (URI) for `tokenId` token.
      */
     function tokenURI(uint256 tokenId) external view returns (string memory);
-}
-
-
-// File @openzeppelin/contracts/utils/Address.sol@v4.6.0
-
-// SPDX-License-Identifier: MIT
-// OpenZeppelin Contracts (last updated v4.5.0) (utils/Address.sol)
-
-pragma solidity ^0.8.1;
-
-/**
- * @dev Collection of functions related to the address type
- */
-library Address {
-    /**
-     * @dev Returns true if `account` is a contract.
-     *
-     * [IMPORTANT]
-     * ====
-     * It is unsafe to assume that an address for which this function returns
-     * false is an externally-owned account (EOA) and not a contract.
-     *
-     * Among others, `isContract` will return false for the following
-     * types of addresses:
-     *
-     *  - an externally-owned account
-     *  - a contract in construction
-     *  - an address where a contract will be created
-     *  - an address where a contract lived, but was destroyed
-     * ====
-     *
-     * [IMPORTANT]
-     * ====
-     * You shouldn't rely on `isContract` to protect against flash loan attacks!
-     *
-     * Preventing calls from contracts is highly discouraged. It breaks composability, breaks support for smart wallets
-     * like Gnosis Safe, and does not provide security since it can be circumvented by calling from a contract
-     * constructor.
-     * ====
-     */
-    function isContract(address account) internal view returns (bool) {
-        // This method relies on extcodesize/address.code.length, which returns 0
-        // for contracts in construction, since the code is only stored at the end
-        // of the constructor execution.
-
-        return account.code.length > 0;
-    }
-
-    /**
-     * @dev Replacement for Solidity's `transfer`: sends `amount` wei to
-     * `recipient`, forwarding all available gas and reverting on errors.
-     *
-     * https://eips.ethereum.org/EIPS/eip-1884[EIP1884] increases the gas cost
-     * of certain opcodes, possibly making contracts go over the 2300 gas limit
-     * imposed by `transfer`, making them unable to receive funds via
-     * `transfer`. {sendValue} removes this limitation.
-     *
-     * https://diligence.consensys.net/posts/2019/09/stop-using-soliditys-transfer-now/[Learn more].
-     *
-     * IMPORTANT: because control is transferred to `recipient`, care must be
-     * taken to not create reentrancy vulnerabilities. Consider using
-     * {ReentrancyGuard} or the
-     * https://solidity.readthedocs.io/en/v0.5.11/security-considerations.html#use-the-checks-effects-interactions-pattern[checks-effects-interactions pattern].
-     */
-    function sendValue(address payable recipient, uint256 amount) internal {
-        require(address(this).balance >= amount, "Address: insufficient balance");
-
-        (bool success, ) = recipient.call{value: amount}("");
-        require(success, "Address: unable to send value, recipient may have reverted");
-    }
-
-    /**
-     * @dev Performs a Solidity function call using a low level `call`. A
-     * plain `call` is an unsafe replacement for a function call: use this
-     * function instead.
-     *
-     * If `target` reverts with a revert reason, it is bubbled up by this
-     * function (like regular Solidity function calls).
-     *
-     * Returns the raw returned data. To convert to the expected return value,
-     * use https://solidity.readthedocs.io/en/latest/units-and-global-variables.html?highlight=abi.decode#abi-encoding-and-decoding-functions[`abi.decode`].
-     *
-     * Requirements:
-     *
-     * - `target` must be a contract.
-     * - calling `target` with `data` must not revert.
-     *
-     * _Available since v3.1._
-     */
-    function functionCall(address target, bytes memory data) internal returns (bytes memory) {
-        return functionCall(target, data, "Address: low-level call failed");
-    }
-
-    /**
-     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`], but with
-     * `errorMessage` as a fallback revert reason when `target` reverts.
-     *
-     * _Available since v3.1._
-     */
-    function functionCall(
-        address target,
-        bytes memory data,
-        string memory errorMessage
-    ) internal returns (bytes memory) {
-        return functionCallWithValue(target, data, 0, errorMessage);
-    }
-
-    /**
-     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],
-     * but also transferring `value` wei to `target`.
-     *
-     * Requirements:
-     *
-     * - the calling contract must have an ETH balance of at least `value`.
-     * - the called Solidity function must be `payable`.
-     *
-     * _Available since v3.1._
-     */
-    function functionCallWithValue(
-        address target,
-        bytes memory data,
-        uint256 value
-    ) internal returns (bytes memory) {
-        return functionCallWithValue(target, data, value, "Address: low-level call with value failed");
-    }
-
-    /**
-     * @dev Same as {xref-Address-functionCallWithValue-address-bytes-uint256-}[`functionCallWithValue`], but
-     * with `errorMessage` as a fallback revert reason when `target` reverts.
-     *
-     * _Available since v3.1._
-     */
-    function functionCallWithValue(
-        address target,
-        bytes memory data,
-        uint256 value,
-        string memory errorMessage
-    ) internal returns (bytes memory) {
-        require(address(this).balance >= value, "Address: insufficient balance for call");
-        require(isContract(target), "Address: call to non-contract");
-
-        (bool success, bytes memory returndata) = target.call{value: value}(data);
-        return verifyCallResult(success, returndata, errorMessage);
-    }
-
-    /**
-     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],
-     * but performing a static call.
-     *
-     * _Available since v3.3._
-     */
-    function functionStaticCall(address target, bytes memory data) internal view returns (bytes memory) {
-        return functionStaticCall(target, data, "Address: low-level static call failed");
-    }
-
-    /**
-     * @dev Same as {xref-Address-functionCall-address-bytes-string-}[`functionCall`],
-     * but performing a static call.
-     *
-     * _Available since v3.3._
-     */
-    function functionStaticCall(
-        address target,
-        bytes memory data,
-        string memory errorMessage
-    ) internal view returns (bytes memory) {
-        require(isContract(target), "Address: static call to non-contract");
-
-        (bool success, bytes memory returndata) = target.staticcall(data);
-        return verifyCallResult(success, returndata, errorMessage);
-    }
-
-    /**
-     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],
-     * but performing a delegate call.
-     *
-     * _Available since v3.4._
-     */
-    function functionDelegateCall(address target, bytes memory data) internal returns (bytes memory) {
-        return functionDelegateCall(target, data, "Address: low-level delegate call failed");
-    }
-
-    /**
-     * @dev Same as {xref-Address-functionCall-address-bytes-string-}[`functionCall`],
-     * but performing a delegate call.
-     *
-     * _Available since v3.4._
-     */
-    function functionDelegateCall(
-        address target,
-        bytes memory data,
-        string memory errorMessage
-    ) internal returns (bytes memory) {
-        require(isContract(target), "Address: delegate call to non-contract");
-
-        (bool success, bytes memory returndata) = target.delegatecall(data);
-        return verifyCallResult(success, returndata, errorMessage);
-    }
-
-    /**
-     * @dev Tool to verifies that a low level call was successful, and revert if it wasn't, either by bubbling the
-     * revert reason using the provided one.
-     *
-     * _Available since v4.3._
-     */
-    function verifyCallResult(
-        bool success,
-        bytes memory returndata,
-        string memory errorMessage
-    ) internal pure returns (bytes memory) {
-        if (success) {
-            return returndata;
-        } else {
-            // Look for revert reason and bubble it up if present
-            if (returndata.length > 0) {
-                // The easiest way to bubble the revert reason is using memory via assembly
-
-                assembly {
-                    let returndata_size := mload(returndata)
-                    revert(add(32, returndata), returndata_size)
-                }
-            } else {
-                revert(errorMessage);
-            }
-        }
-    }
 }
 
 
@@ -2024,36 +2211,218 @@ abstract contract AccessControlEnumerable is IAccessControlEnumerable, AccessCon
 }
 
 
-// File contracts/token/CN.sol
+// File @openzeppelin/contracts/security/ReentrancyGuard.sol@v4.6.0
+
+// SPDX-License-Identifier: MIT
+// OpenZeppelin Contracts v4.4.1 (security/ReentrancyGuard.sol)
+
+pragma solidity ^0.8.0;
+
+/**
+ * @dev Contract module that helps prevent reentrant calls to a function.
+ *
+ * Inheriting from `ReentrancyGuard` will make the {nonReentrant} modifier
+ * available, which can be applied to functions to make sure there are no nested
+ * (reentrant) calls to them.
+ *
+ * Note that because there is a single `nonReentrant` guard, functions marked as
+ * `nonReentrant` may not call one another. This can be worked around by making
+ * those functions `private`, and then adding `external` `nonReentrant` entry
+ * points to them.
+ *
+ * TIP: If you would like to learn more about reentrancy and alternative ways
+ * to protect against it, check out our blog post
+ * https://blog.openzeppelin.com/reentrancy-after-istanbul/[Reentrancy After Istanbul].
+ */
+abstract contract ReentrancyGuard {
+    // Booleans are more expensive than uint256 or any type that takes up a full
+    // word because each write operation emits an extra SLOAD to first read the
+    // slot's contents, replace the bits taken up by the boolean, and then write
+    // back. This is the compiler's defense against contract upgrades and
+    // pointer aliasing, and it cannot be disabled.
+
+    // The values being non-zero value makes deployment a bit more expensive,
+    // but in exchange the refund on every call to nonReentrant will be lower in
+    // amount. Since refunds are capped to a percentage of the total
+    // transaction's gas, it is best to keep them low in cases like this one, to
+    // increase the likelihood of the full refund coming into effect.
+    uint256 private constant _NOT_ENTERED = 1;
+    uint256 private constant _ENTERED = 2;
+
+    uint256 private _status;
+
+    constructor() {
+        _status = _NOT_ENTERED;
+    }
+
+    /**
+     * @dev Prevents a contract from calling itself, directly or indirectly.
+     * Calling a `nonReentrant` function from another `nonReentrant`
+     * function is not supported. It is possible to prevent this from happening
+     * by making the `nonReentrant` function external, and making it call a
+     * `private` function that does the actual work.
+     */
+    modifier nonReentrant() {
+        // On the first call to nonReentrant, _notEntered will be true
+        require(_status != _ENTERED, "ReentrancyGuard: reentrant call");
+
+        // Any calls to nonReentrant after this point will fail
+        _status = _ENTERED;
+
+        _;
+
+        // By storing the original value once again, a refund is triggered (see
+        // https://eips.ethereum.org/EIPS/eip-2200)
+        _status = _NOT_ENTERED;
+    }
+}
+
+
+// File contracts/tool/interface/IVRFOracleOraichain.sol
+
+// SPDX-License-Identifier: MIT
+pragma solidity >=0.8.12;
+
+interface IVRFOracleOraichain {
+    function randomnessRequest(uint256 _seed, bytes calldata _data)
+        external
+        payable
+        returns (bytes32 reqId);
+
+    function getFee() external returns (uint256);
+}
+
+
+// File contracts/token/interface/ICN.sol
 
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.12;
 /**
- * @title Cyber Gear NFT
+ * @title CN Interface
  * @author FUNTOPIA-TEAM
- * @notice Contract to supply CN
+ * @notice Interface of the CN
  */
-contract CN is ERC721Enumerable, AccessControlEnumerable {
-    using Strings for uint256;
-
-    bytes32 public constant MANAGER_ROLE = keccak256("MANAGER_ROLE");
-    bytes32 public constant SPAWNER_ROLE = keccak256("SPAWNER_ROLE");
-    bytes32 public constant SETTER_ROLE = keccak256("SETTER_ROLE");
-
-    string public baseURI;
-
+abstract contract ICN is IERC721Enumerable {
     mapping(uint256 => mapping(string => uint256)) public data;
     mapping(uint256 => mapping(string => uint256[])) public datas;
 
+    function spawnCn(uint256 hero, address to)
+        external
+        virtual
+        returns (uint256);
+
+    function setData(
+        uint256 cnId,
+        string memory slot,
+        uint256 _data
+    ) external virtual;
+
+    function setDatas(
+        uint256 cnId,
+        string memory slot,
+        uint256[] memory _datas
+    ) external virtual;
+
+    function safeTransferFromBatch(
+        address from,
+        address to,
+        uint256[] memory tokenIds
+    ) external virtual;
+
+    function getDatas(uint256 cnId, string memory slot)
+        external
+        view
+        virtual
+        returns (uint256[] memory);
+
+    function tokensOfOwnerBySize(
+        address user,
+        uint256 cursor,
+        uint256 size
+    ) external view virtual returns (uint256[] memory, uint256);
+
+    function getRandomNumber(
+        uint256 cnId,
+        string memory slot,
+        uint256 base,
+        uint256 range
+    ) external pure virtual returns (uint256);
+}
+
+
+// File contracts/token/CB.sol
+
+// SPDX-License-Identifier: MIT
+pragma solidity >=0.8.12;
+/**
+ * @title Cyber Gear Box
+ * @author FUNTOPIA-TEAM
+ * @notice Contract to supply CB
+ */
+contract CB is ERC721Enumerable, AccessControlEnumerable, ReentrancyGuard {
+    using SafeERC20 for IERC20;
+    using EnumerableSet for EnumerableSet.AddressSet;
+    using Strings for uint256;
+
+    // testnet: 0x82174e5d7f2a4cCbCC9D14b3930C8935541e6222
+    address public oracle = 0x6b5866f4B9832bFF3d8aD81B1151a37393f6B7D5;
+
+    mapping(bytes32 => address) public reqIdToUser;
+    mapping(bytes32 => uint256[]) public reqIdToTypes;
+
+    bytes32 public constant MANAGER_ROLE = keccak256("MANAGER_ROLE");
+
+    ICN public cn;
+
+    string public baseURI;
+
+    mapping(uint256 => uint256) public cbIdToType;
+
+    mapping(uint256 => uint256) public boxTokenPrices;
+    mapping(uint256 => address) public tokenAddrs;
+    mapping(uint256 => address) public receivingAddrs;
+    mapping(uint256 => uint256) public hourlyBuyLimits;
+    mapping(uint256 => bool) public whiteListFlags;
+    mapping(uint256 => uint256[]) public heroProbabilities;
+
+    mapping(uint256 => uint256) public boxesMaxSupply;
+    mapping(uint256 => uint256) public totalBoxesLength;
+    mapping(address => mapping(uint256 => mapping(uint256 => uint256)))
+        public userHourlyBoxesLength;
+    mapping(uint256 => EnumerableSet.AddressSet) private whiteList;
+
     event SetBaseURI(string uri);
-    event SpawnCn(address indexed to, uint256 cnId, uint256 hero);
-    event SetData(uint256 indexed cnId, string slot, uint256 data);
-    event SetDatas(uint256 indexed cnId, string slot, uint256[] datas);
+    event SetAddrs(address cnAddr);
+    event SetBoxInfo(
+        uint256 boxType,
+        uint256 boxTokenPrice,
+        address tokenAddr,
+        address receivingAddr,
+        uint256 hourlyBuylimit,
+        bool whiteListFlag,
+        uint256[] heroProbability
+    );
+    event AddBoxesMaxSupply(uint256 supply, uint256 boxType);
+    event AddWhiteList(uint256 boxType, address[] whiteUsers);
+    event RemoveWhiteList(uint256 boxType, address[] whiteUsers);
+    event BuyBoxes(
+        address indexed user,
+        uint256 amount,
+        uint256[] cbIds,
+        uint256 boxType
+    );
+    event OpenBoxes(
+        address indexed user,
+        uint256 amount,
+        uint256[] cbIds,
+        uint256[] boxTypes
+    );
+    event SpawnCns(address indexed user, uint256 amount, uint256[] cnIds);
 
     /**
      * @param manager Initialize Manager Role
      */
-    constructor(address manager) ERC721("Cyber Gear NFT", "CN") {
+    constructor(address manager) ERC721("Cyber Gear Box", "CB") {
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _setupRole(MANAGER_ROLE, manager);
     }
@@ -2068,48 +2437,178 @@ contract CN is ERC721Enumerable, AccessControlEnumerable {
     }
 
     /**
-     * @dev Spawn a New Cn to an Address
+     * @dev Set Addrs
      */
-    function spawnCn(uint256 hero, address to)
+    function setAddrs(address cnAddr) external onlyRole(MANAGER_ROLE) {
+        cn = ICN(cnAddr);
+
+        emit SetAddrs(cnAddr);
+    }
+
+    /**
+     * @dev Set Box Info
+     */
+    function setBoxInfo(
+        uint256 boxType,
+        uint256 boxTokenPrice,
+        address tokenAddr,
+        address receivingAddr,
+        uint256 hourlyBuyLimit,
+        bool whiteListFlag,
+        uint256[] memory heroProbability
+    ) external onlyRole(MANAGER_ROLE) {
+        boxTokenPrices[boxType] = boxTokenPrice;
+        tokenAddrs[boxType] = tokenAddr;
+        receivingAddrs[boxType] = receivingAddr;
+        hourlyBuyLimits[boxType] = hourlyBuyLimit;
+        whiteListFlags[boxType] = whiteListFlag;
+        heroProbabilities[boxType] = heroProbability;
+
+        emit SetBoxInfo(
+            boxType,
+            boxTokenPrice,
+            tokenAddr,
+            receivingAddr,
+            hourlyBuyLimit,
+            whiteListFlag,
+            heroProbability
+        );
+    }
+
+    /**
+     * @dev Add Boxes Max Supply
+     */
+    function addBoxesMaxSupply(uint256 supply, uint256 boxType)
         external
-        onlyRole(SPAWNER_ROLE)
-        returns (uint256)
+        onlyRole(MANAGER_ROLE)
     {
-        uint256 newCnId = totalSupply();
+        boxesMaxSupply[boxType] += supply;
 
-        data[newCnId]["hero"] = hero;
-
-        _safeMint(to, newCnId);
-
-        emit SpawnCn(to, newCnId, hero);
-
-        return newCnId;
+        emit AddBoxesMaxSupply(supply, boxType);
     }
 
     /**
-     * @dev Set Data
+     * @dev Add White List
      */
-    function setData(
-        uint256 cnId,
-        string memory slot,
-        uint256 _data
-    ) external onlyRole(SETTER_ROLE) {
-        data[cnId][slot] = _data;
+    function addWhiteList(uint256 boxType, address[] memory whiteUsers)
+        external
+        onlyRole(MANAGER_ROLE)
+    {
+        for (uint256 i = 0; i < whiteUsers.length; i++) {
+            whiteList[boxType].add(whiteUsers[i]);
+        }
 
-        emit SetData(cnId, slot, _data);
+        emit AddWhiteList(boxType, whiteUsers);
     }
 
     /**
-     * @dev Set Datas
+     * @dev Remove White List
      */
-    function setDatas(
-        uint256 cnId,
-        string memory slot,
-        uint256[] memory _datas
-    ) external onlyRole(SETTER_ROLE) {
-        datas[cnId][slot] = _datas;
+    function removeWhiteList(uint256 boxType, address[] memory whiteUsers)
+        external
+        onlyRole(MANAGER_ROLE)
+    {
+        for (uint256 i = 0; i < whiteUsers.length; i++) {
+            whiteList[boxType].remove(whiteUsers[i]);
+        }
 
-        emit SetDatas(cnId, slot, _datas);
+        emit RemoveWhiteList(boxType, whiteUsers);
+    }
+
+    /**
+     * @dev Users buy the boxes
+     */
+    function buyBoxes(uint256 amount, uint256 boxType)
+        external
+        payable
+        nonReentrant
+    {
+        require(amount > 0, "Amount must > 0");
+        require(
+            getUserHourlyBoxesLeftSupply(
+                boxType,
+                msg.sender,
+                block.timestamp
+            ) >= amount,
+            "Amount exceeds the hourly buy limit"
+        );
+        require(
+            getBoxesLeftSupply(boxType) >= amount,
+            "Not enough boxes supply"
+        );
+        require(
+            boxTokenPrices[boxType] > 0,
+            "The box price of this box has not been set"
+        );
+        require(
+            receivingAddrs[boxType] != address(0),
+            "The receiving address of this box has not been set"
+        );
+        require(
+            heroProbabilities[boxType].length == 15,
+            "The hero probability of this box has not been set"
+        );
+        if (whiteListFlags[boxType]) {
+            require(
+                whiteList[boxType].contains(msg.sender),
+                "Your address must be on the whitelist"
+            );
+        }
+
+        uint256 price = amount * boxTokenPrices[boxType];
+        if (tokenAddrs[boxType] == address(0)) {
+            require(msg.value == price, "Price mismatch");
+            payable(receivingAddrs[boxType]).transfer(price);
+        } else {
+            IERC20 token = IERC20(tokenAddrs[boxType]);
+            token.safeTransferFrom(msg.sender, receivingAddrs[boxType], price);
+        }
+
+        uint256[] memory cbIds = new uint256[](amount);
+        for (uint256 i = 0; i < amount; i++) {
+            cbIds[i] = totalSupply();
+            cbIdToType[cbIds[i]] = boxType;
+
+            _safeMint(msg.sender, cbIds[i]);
+        }
+
+        userHourlyBoxesLength[msg.sender][boxType][
+            block.timestamp / 1 hours
+        ] += amount;
+        totalBoxesLength[boxType] += amount;
+
+        emit BuyBoxes(msg.sender, amount, cbIds, boxType);
+    }
+
+    /**
+     * @dev Users open the boxes
+     */
+    function openBoxes(uint256[] memory cbIds) external nonReentrant {
+        require(cbIds.length > 0, "Amount must > 0");
+
+        uint256[] memory boxTypes = new uint256[](cbIds.length);
+        for (uint256 i = 0; i < cbIds.length; i++) {
+            boxTypes[i] = cbIdToType[cbIds[i]];
+
+            safeTransferFrom(
+                msg.sender,
+                0x000000000000000000000000000000000000dEaD,
+                cbIds[i]
+            );
+        }
+
+        uint256 fee = IVRFOracleOraichain(oracle).getFee();
+        bytes memory data = abi.encode(
+            address(this),
+            this.fulfillRandomness.selector
+        );
+        bytes32 reqId = IVRFOracleOraichain(oracle).randomnessRequest{
+            value: fee
+        }(cbIds[0] + cbIds.length + block.number, data);
+        reqIdToUser[reqId] = msg.sender;
+        reqIdToTypes[reqId] = boxTypes;
+
+        emit OpenBoxes(msg.sender, cbIds.length, cbIds, boxTypes);
     }
 
     /**
@@ -2123,17 +2622,6 @@ contract CN is ERC721Enumerable, AccessControlEnumerable {
         for (uint256 i = 0; i < tokenIds.length; i++) {
             safeTransferFrom(from, to, tokenIds[i]);
         }
-    }
-
-    /**
-     * @dev Get Datas
-     */
-    function getDatas(uint256 cnId, string memory slot)
-        external
-        view
-        returns (uint256[] memory)
-    {
-        return datas[cnId][slot];
     }
 
     /**
@@ -2158,16 +2646,54 @@ contract CN is ERC721Enumerable, AccessControlEnumerable {
     }
 
     /**
-     * @dev Get Random Number
+     * @dev Get White List Existence
      */
-    function getRandomNumber(
-        uint256 cnId,
-        string memory slot,
-        uint256 base,
-        uint256 range
-    ) external pure returns (uint256) {
-        uint256 randomness = uint256(keccak256(abi.encodePacked(cnId, slot)));
-        return base + (randomness % range);
+    function getWhiteListExistence(uint256 boxType, address user)
+        external
+        view
+        returns (bool)
+    {
+        return whiteList[boxType].contains(user);
+    }
+
+    /**
+     * @dev Get Boxes Left Supply
+     */
+    function getBoxesLeftSupply(uint256 boxType) public view returns (uint256) {
+        return boxesMaxSupply[boxType] - totalBoxesLength[boxType];
+    }
+
+    /**
+     * @dev Get User Hourly Boxes Left Supply
+     */
+    function getUserHourlyBoxesLeftSupply(
+        uint256 boxType,
+        address user,
+        uint256 timestamp
+    ) public view returns (uint256) {
+        return
+            hourlyBuyLimits[boxType] -
+            userHourlyBoxesLength[user][boxType][timestamp / 1 hours];
+    }
+
+    function random(uint256 _oraiNumber, uint256 _weight)
+        public
+        view
+        returns (uint256)
+    {
+        return
+            uint256(
+                keccak256(
+                    abi.encodePacked(
+                        _oraiNumber,
+                        block.difficulty,
+                        block.timestamp,
+                        block.coinbase,
+                        block.number,
+                        msg.sender
+                    )
+                )
+            ) % (_weight);
     }
 
     /**
@@ -2191,7 +2717,7 @@ contract CN is ERC721Enumerable, AccessControlEnumerable {
                         baseURI,
                         tokenId.toString(),
                         "-",
-                        data[tokenId]["hero"].toString()
+                        cbIdToType[tokenId].toString()
                     )
                 )
                 : "";
@@ -2207,5 +2733,47 @@ contract CN is ERC721Enumerable, AccessControlEnumerable {
         returns (bool)
     {
         return super.supportsInterface(interfaceId);
+    }
+
+    /**
+     * @dev Get Level
+     */
+    function getLevel(uint256[] memory array, uint256 _random)
+        public
+        pure
+        returns (uint256)
+    {
+        uint256 accProbability;
+        uint256 level;
+        for (uint256 i = 0; i < array.length; i++) {
+            accProbability += array[i];
+            if (_random < accProbability) {
+                level = i;
+                break;
+            }
+        }
+        return level + 1;
+    }
+
+    /**
+     * @dev Spawn CN to User when get Randomness Response
+     */
+    function fulfillRandomness(bytes32 _reqId, uint256 oraichainRandomness)
+        public
+    {
+        require(msg.sender == oracle, "Caller must is oracle");
+
+        uint256[] memory cnIds = new uint256[](reqIdToTypes[_reqId].length);
+
+        for (uint256 i = 0; i < cnIds.length; i++) {
+            uint256 hero = getLevel(
+                heroProbabilities[reqIdToTypes[_reqId][i]],
+                oraichainRandomness = random(oraichainRandomness, 1e4)
+            );
+
+            cnIds[i] = cn.spawnCn(hero, reqIdToUser[_reqId]);
+        }
+
+        emit SpawnCns(reqIdToUser[_reqId], cnIds.length, cnIds);
     }
 }

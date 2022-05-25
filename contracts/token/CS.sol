@@ -11,7 +11,7 @@ import "../token/interface/ICN.sol";
 
 /**
  * @title Cyber Gear Shards
- * @author ISEKAI-TEAM
+ * @author FUNTOPIA-TEAM
  * @notice Contract to supply CS
  */
 contract CS is ERC721Enumerable, AccessControlEnumerable, ReentrancyGuard {
@@ -24,7 +24,7 @@ contract CS is ERC721Enumerable, AccessControlEnumerable, ReentrancyGuard {
 
     string public baseURI;
 
-    IERC20 public kai;
+    IERC20 public fun;
     ICN public cn;
 
     uint256[15] public craftPrices = [
@@ -49,7 +49,7 @@ contract CS is ERC721Enumerable, AccessControlEnumerable, ReentrancyGuard {
     mapping(uint256 => mapping(string => uint256[])) public datas;
 
     event SetBaseURI(string uri);
-    event SetAddrs(address kaiAddr, address cnAddr);
+    event SetAddrs(address funAddr, address cnAddr);
     event SetPrices(uint256[15] prices);
     event SpawnCss(address indexed to, uint256[] csIds, uint256[] heros);
     event SetData(uint256 indexed csId, string slot, uint256 data);
@@ -81,14 +81,14 @@ contract CS is ERC721Enumerable, AccessControlEnumerable, ReentrancyGuard {
     /**
      * @dev Set Addrs
      */
-    function setAddrs(address kaiAddr, address cnAddr)
+    function setAddrs(address funAddr, address cnAddr)
         external
         onlyRole(MANAGER_ROLE)
     {
-        kai = IERC20(kaiAddr);
+        fun = IERC20(funAddr);
         cn = ICN(cnAddr);
 
-        emit SetAddrs(kaiAddr, cnAddr);
+        emit SetAddrs(funAddr, cnAddr);
     }
 
     /**
@@ -162,7 +162,7 @@ contract CS is ERC721Enumerable, AccessControlEnumerable, ReentrancyGuard {
         require(hero < 100, "Hero must < 100");
 
         uint256 craftPrice = getCraftPrice(csIds);
-        kai.safeTransferFrom(
+        fun.safeTransferFrom(
             msg.sender,
             0x000000000000000000000000000000000000dEaD,
             craftPrice

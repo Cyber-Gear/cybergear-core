@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 
 /**
  * @title Cyber Gear NFT
- * @author ISEKAI-TEAM
+ * @author FUNTOPIA-TEAM
  * @notice Contract to supply CN
  */
 contract CN is ERC721Enumerable, AccessControlEnumerable {

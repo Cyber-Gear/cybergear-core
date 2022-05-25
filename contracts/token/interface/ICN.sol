@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol";
 
 /**
  * @title CN Interface
- * @author ISEKAI-TEAM
+ * @author FUNTOPIA-TEAM
  * @notice Interface of the CN
  */
 abstract contract ICN is IERC721Enumerable {
