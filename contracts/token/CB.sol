@@ -202,7 +202,7 @@ contract CB is ERC721Enumerable, AccessControlEnumerable, ReentrancyGuard {
             "The receiving address of this box has not been set"
         );
         require(
-            heroProbabilities[boxType].length == 15,
+            heroProbabilities[boxType].length > 0,
             "The hero probability of this box has not been set"
         );
         if (whiteListFlags[boxType]) {

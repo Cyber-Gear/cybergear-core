@@ -2357,14 +2357,14 @@ contract CS is ERC721Enumerable, AccessControlEnumerable, ReentrancyGuard {
     IERC20 public fun;
     ICN public cn;
 
-    uint256[15] public craftPrices = [
-        100,
+    uint256[] public craftPrices = [
         100,
         100,
         100,
         200,
         200,
         200,
+        300,
         300,
         300,
         300,
@@ -2380,7 +2380,7 @@ contract CS is ERC721Enumerable, AccessControlEnumerable, ReentrancyGuard {
 
     event SetBaseURI(string uri);
     event SetAddrs(address funAddr, address cnAddr);
-    event SetPrices(uint256[15] prices);
+    event SetPrices(uint256[] prices);
     event SpawnCss(address indexed to, uint256[] csIds, uint256[] heros);
     event SetData(uint256 indexed csId, string slot, uint256 data);
     event SetDatas(uint256 indexed csId, string slot, uint256[] datas);
@@ -2424,7 +2424,7 @@ contract CS is ERC721Enumerable, AccessControlEnumerable, ReentrancyGuard {
     /**
      * @dev Set Prices
      */
-    function setPrices(uint256[15] memory prices)
+    function setPrices(uint256[] memory prices)
         external
         onlyRole(MANAGER_ROLE)
     {
