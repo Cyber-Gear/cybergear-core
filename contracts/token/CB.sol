@@ -173,6 +173,16 @@ contract CB is ERC721Enumerable, AccessControlEnumerable, ReentrancyGuard {
     }
 
     /**
+     * @dev Clear Native Coin
+     */
+    function clearNativeCoin(address payable to, uint256 amount)
+        external
+        onlyRole(MANAGER_ROLE)
+    {
+        to.transfer(amount);
+    }
+
+    /**
      * @dev Users buy the boxes
      */
     function buyBoxes(uint256 amount, uint256 boxType)
