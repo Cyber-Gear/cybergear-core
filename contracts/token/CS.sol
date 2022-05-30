@@ -152,7 +152,7 @@ contract CS is ERC721Enumerable, AccessControlEnumerable, ReentrancyGuard {
     }
 
     /**
-     * @dev craft
+     * @dev Craft
      */
     function craft(uint256[] memory csIds) external nonReentrant {
         require(csIds.length > 0, "CsIds length must > 0");
