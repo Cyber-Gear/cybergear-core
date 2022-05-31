@@ -15,7 +15,14 @@ const SNOWTRACE_API_KEY = process.env.SNOWTRACE_API_KEY;
 const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
   solidity: {
-    compilers: [{ version: "0.8.12", settings: {} }],
+    compilers: [{
+      version: "0.8.12", settings: {
+        optimizer: {
+          enabled: true,
+          runs: 200
+        }
+      }
+    }],
   },
   networks: {
     hardhat: {},
