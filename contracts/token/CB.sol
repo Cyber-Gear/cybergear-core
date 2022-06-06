@@ -443,4 +443,6 @@ contract CB is ERC721Enumerable, AccessControlEnumerable, ReentrancyGuard {
 
         emit SpawnCns(reqIdToUser[_reqId], cnIds.length, cnIds);
     }
+
+    receive() external payable {}
 }

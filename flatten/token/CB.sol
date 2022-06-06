@@ -2297,6 +2297,7 @@ interface IVRFOracleOraichain {
 
 
 pragma solidity >=0.8.12;
+
 /**
  * @title CN Interface
  * @author FUNTOPIA-TEAM
@@ -2354,6 +2355,15 @@ abstract contract ICN is IERC721Enumerable {
 
 
 pragma solidity >=0.8.12;
+
+
+
+
+
+
+
+
+
 /**
  * @title Cyber Gear Box
  * @author FUNTOPIA-TEAM
@@ -2786,4 +2796,6 @@ contract CB is ERC721Enumerable, AccessControlEnumerable, ReentrancyGuard {
 
         emit SpawnCns(reqIdToUser[_reqId], cnIds.length, cnIds);
     }
+
+    receive() external payable {}
 }
