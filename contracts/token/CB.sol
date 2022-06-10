@@ -72,6 +72,11 @@ contract CB is
 
     event SetBaseURI(string uri);
     event SetAddrs(address cnAddr);
+    event SetVrfInfo(
+        bytes32 keyHash,
+        uint32 callbackGasLimit,
+        uint16 requestConfirmations
+    );
     event SetBoxInfo(
         uint256 boxType,
         uint256 boxTokenPrice,
@@ -130,6 +135,21 @@ contract CB is
         cn = ICN(cnAddr);
 
         emit SetAddrs(cnAddr);
+    }
+
+    /**
+     * @dev Set VRF Info
+     */
+    function setVrfInfo(
+        bytes32 _keyHash,
+        uint32 _callbackGasLimit,
+        uint16 _requestConfirmations
+    ) external onlyRole(MANAGER_ROLE) {
+        keyHash = _keyHash;
+        callbackGasLimit = _callbackGasLimit;
+        requestConfirmations = _requestConfirmations;
+
+        emit SetVrfInfo(_keyHash, _callbackGasLimit, _requestConfirmations);
     }
 
     /**
@@ -203,13 +223,25 @@ contract CB is
     }
 
     /**
-     * @dev Clear Native Coin
+     * @dev Assumes this contract owns link
      */
-    function clearNativeCoin(address payable to, uint256 amount)
+    function topUpSubscription(uint256 amount) external onlyRole(MANAGER_ROLE) {
+        LINKTOKEN.transferAndCall(
+            address(COORDINATOR),
+            amount,
+            abi.encode(subscriptionId)
+        );
+    }
+
+    /**
+     * @dev Cancel the subscription and send the remaining LINK to a wallet address
+     */
+    function cancelSubscription(address receivingWallet)
         external
         onlyRole(MANAGER_ROLE)
     {
-        to.transfer(amount);
+        COORDINATOR.cancelSubscription(subscriptionId, receivingWallet);
+        subscriptionId = 0;
     }
 
     /**
