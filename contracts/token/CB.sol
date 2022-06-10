@@ -8,7 +8,9 @@ import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
-import "../tool/interface/IVRFOracleOraichain.sol";
+import "@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol";
+import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
+import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 import "../token/interface/ICN.sol";
 
 /**
@@ -16,16 +18,36 @@ import "../token/interface/ICN.sol";
  * @author FUNTOPIA-TEAM
  * @notice Contract to supply CB
  */
-contract CB is ERC721Enumerable, AccessControlEnumerable, ReentrancyGuard {
+contract CB is
+    ERC721Enumerable,
+    AccessControlEnumerable,
+    ReentrancyGuard,
+    VRFConsumerBaseV2
+{
     using SafeERC20 for IERC20;
     using EnumerableSet for EnumerableSet.AddressSet;
     using Strings for uint256;
 
-    // testnet: 0x82174e5d7f2a4cCbCC9D14b3930C8935541e6222
-    address public oracle = 0x6b5866f4B9832bFF3d8aD81B1151a37393f6B7D5;
+    VRFCoordinatorV2Interface public COORDINATOR;
+    LinkTokenInterface public LINKTOKEN;
 
-    mapping(bytes32 => address) public reqIdToUser;
-    mapping(bytes32 => uint256[]) public reqIdToTypes;
+    // testnet: 0x2eD832Ba664535e5886b75D64C46EB9a228C2610
+    address public vrfCoordinator = 0xd5D517aBE5cF79B7e95eC98dB0f0277788aFF634;
+
+    // testnet: 0x0b9d5D9136855f6FEc3c0993feE6E9CE8a297846
+    address public link_token_contract =
+        0x5947BB275c521040051D82396192181b413227A3;
+
+    // testnet: 0x354d2f95da55398f44b7cff77da56283d9c6c829a4bdf1bbcaf2ad6a4d081f61
+    bytes32 public keyHash =
+        0x83250c5584ffa93feb6ee082981c5ebe484c865196750b39835ad4f13780435d;
+
+    uint32 public callbackGasLimit = 2500000;
+    uint16 public requestConfirmations = 3;
+
+    uint64 public subscriptionId;
+    mapping(uint256 => address) public requestIdToUser;
+    mapping(uint256 => uint256[]) public requestIdToTypes;
 
     bytes32 public constant MANAGER_ROLE = keccak256("MANAGER_ROLE");
 
@@ -79,9 +101,17 @@ contract CB is ERC721Enumerable, AccessControlEnumerable, ReentrancyGuard {
     /**
      * @param manager Initialize Manager Role
      */
-    constructor(address manager) ERC721("Cyber Gear Box", "CB") {
+    constructor(address manager)
+        ERC721("Cyber Gear Box", "CB")
+        VRFConsumerBaseV2(vrfCoordinator)
+    {
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _setupRole(MANAGER_ROLE, manager);
+
+        COORDINATOR = VRFCoordinatorV2Interface(vrfCoordinator);
+        LINKTOKEN = LinkTokenInterface(link_token_contract);
+        subscriptionId = COORDINATOR.createSubscription();
+        COORDINATOR.addConsumer(subscriptionId, address(this));
     }
 
     /**
@@ -264,16 +294,15 @@ contract CB is ERC721Enumerable, AccessControlEnumerable, ReentrancyGuard {
             );
         }
 
-        uint256 fee = IVRFOracleOraichain(oracle).getFee();
-        bytes memory data = abi.encode(
-            address(this),
-            this.fulfillRandomness.selector
+        uint256 requestId = COORDINATOR.requestRandomWords(
+            keyHash,
+            subscriptionId,
+            requestConfirmations,
+            callbackGasLimit,
+            uint32(cbIds.length)
         );
-        bytes32 reqId = IVRFOracleOraichain(oracle).randomnessRequest{
-            value: fee
-        }(cbIds[0] + cbIds.length + block.number, data);
-        reqIdToUser[reqId] = msg.sender;
-        reqIdToTypes[reqId] = boxTypes;
+        requestIdToUser[requestId] = msg.sender;
+        requestIdToTypes[requestId] = boxTypes;
 
         emit OpenBoxes(msg.sender, cbIds.length, cbIds, boxTypes);
     }
@@ -343,26 +372,6 @@ contract CB is ERC721Enumerable, AccessControlEnumerable, ReentrancyGuard {
             userHourlyBoxesLength[user][boxType][timestamp / 1 hours];
     }
 
-    function random(uint256 _oraiNumber, uint256 _weight)
-        public
-        view
-        returns (uint256)
-    {
-        return
-            uint256(
-                keccak256(
-                    abi.encodePacked(
-                        _oraiNumber,
-                        block.difficulty,
-                        block.timestamp,
-                        block.coinbase,
-                        block.number,
-                        msg.sender
-                    )
-                )
-            ) % (_weight);
-    }
-
     /**
      * @dev Returns the Uniform Resource Identifier (URI) for a token ID
      */
@@ -425,23 +434,22 @@ contract CB is ERC721Enumerable, AccessControlEnumerable, ReentrancyGuard {
     /**
      * @dev Spawn CN to User when get Randomness Response
      */
-    function fulfillRandomness(bytes32 _reqId, uint256 oraichainRandomness)
-        public
+    function fulfillRandomWords(uint256 requestId, uint256[] memory randomWords)
+        internal
+        override
     {
-        require(msg.sender == oracle, "Caller must is oracle");
+        uint256[] memory cnIds = new uint256[](randomWords.length);
 
-        uint256[] memory cnIds = new uint256[](reqIdToTypes[_reqId].length);
-
-        for (uint256 i = 0; i < cnIds.length; i++) {
+        for (uint256 i = 0; i < randomWords.length; i++) {
             uint256 hero = getLevel(
-                heroProbabilities[reqIdToTypes[_reqId][i]],
-                oraichainRandomness = random(oraichainRandomness, 1e4)
+                heroProbabilities[requestIdToTypes[requestId][i]],
+                randomWords[i] % 1e4
             );
 
-            cnIds[i] = cn.spawnCn(hero, reqIdToUser[_reqId]);
+            cnIds[i] = cn.spawnCn(hero, requestIdToUser[requestId]);
         }
 
-        emit SpawnCns(reqIdToUser[_reqId], cnIds.length, cnIds);
+        emit SpawnCns(requestIdToUser[requestId], randomWords.length, cnIds);
     }
 
     receive() external payable {}
