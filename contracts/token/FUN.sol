@@ -10,6 +10,6 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
  */
 contract FUN is ERC20 {
     constructor() ERC20("Fun Topia", "FUN") {
-        _mint(msg.sender, 1e8 * 1e18);
+        _mint(msg.sender, 1e10 * 1e18);
     }
 }
