@@ -77,7 +77,7 @@ describe("Market", async () => {
     });
 
     describe("sell",async () =>{
-        it(`CB#2 token is AVAX, price is 10, seller addr2;
+        it(`CB#2 token is ETH, price is 10, seller addr2;
             CS#2 token is FUN, price is 1,seller addr2;
             CN#1 token is FUN, price is 50,seller addr3;
             `,async ()=>{
@@ -171,7 +171,7 @@ describe("Market", async () => {
     describe("buy",async ()=>{
         it(`On sale:
             CS#0 token is FUN, price is 5,seller addr2;
-            CS#1 token is AVAX, price is 1,seller addr2;
+            CS#1 token is ETH, price is 1,seller addr2;
             CS#2 token is FUN, price is 2,seller addr2;
             CS#3 token is FUN, price is 3,seller addr2;
             addr3 buy CS#0 CS#1;
