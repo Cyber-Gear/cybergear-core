@@ -10,7 +10,7 @@ import "solidity-coverage";
 const PRIVATE_KEY =
   process.env.PRIVATE_KEY! ||
   "c87509a1c067bbde78beb793e6fa76530b6382a4c0241e5e4a9ec0a0f44dc0d3"; // well known private key
-const SNOWTRACE_API_KEY = process.env.SNOWTRACE_API_KEY;
+const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY;
 
 const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
@@ -28,15 +28,15 @@ const config: HardhatUserConfig = {
     hardhat: {},
     localhost: {},
     testnet: {
-      url: "https://api.avax-test.network/ext/bc/C/rpc",
-      chainId: 43113,
+      url: "https://rinkeby.infura.io/v3/",
+      chainId: 4,
       gas: 2100000,
       gasPrice: 20000000000,
       accounts: [PRIVATE_KEY]
     },
     mainnet: {
-      url: "https://api.avax.network/ext/bc/C/rpc",
-      chainId: 43114,
+      url: "https://mainnet.infura.io/v3/",
+      chainId: 1,
       gas: 2100000,
       gasPrice: 20000000000,
       accounts: [PRIVATE_KEY]
@@ -46,9 +46,9 @@ const config: HardhatUserConfig = {
     },
   },
   etherscan: {
-    // Your API key for Snowtrace
-    // Obtain one at https://snowtrace.io/
-    apiKey: SNOWTRACE_API_KEY,
+    // Your API key for Etherscan
+    // Obtain one at https://etherscan.io
+    apiKey: ETHERSCAN_API_KEY,
   },
 };
 

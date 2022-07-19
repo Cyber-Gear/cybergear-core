@@ -22,15 +22,15 @@ npm run test
 npm run coverage
 ```
 
-## Deploy and Verify to Avalanche-Testnet
+## Deploy and Verify to Rinkeby
 
-Create a new `.env` file in the root directory, and put your PRIVATE_KEY and SNOWTRACE_API_KEY in it.
+Create a new `.env` file in the root directory, and put your PRIVATE_KEY and ETHERSCAN_API_KEY in it.
 
-If you do not have SNOWTRACE_API_KEY, go to `https://snowtrace.io/myapikey` and add one.
+If you do not have ETHERSCAN_API_KEY, go to `https://etherscan.io/myapikey` and add one.
 
 ```
 PRIVATE_KEY = <Your Private Key>
-SNOWTRACE_API_KEY = <Your Snowtrace Api Key>
+ETHERSCAN_API_KEY = <Your Etherscan Api Key>
 ```
 
 And then run:
