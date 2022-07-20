@@ -2666,16 +2666,16 @@ contract CB is
     VRFCoordinatorV2Interface public COORDINATOR;
     LinkTokenInterface public LINKTOKEN;
 
-    // testnet: 0x2eD832Ba664535e5886b75D64C46EB9a228C2610
-    address public vrfCoordinator = 0xd5D517aBE5cF79B7e95eC98dB0f0277788aFF634;
+    // testnet: 0x6168499c0cFfCaCD319c818142124B7A15E857ab
+    address public vrfCoordinator = 0x271682DEB8C4E0901D1a1550aD2e64D568E69909;
 
-    // testnet: 0x0b9d5D9136855f6FEc3c0993feE6E9CE8a297846
+    // testnet: 0x01BE23585060835E02B77ef475b0Cc51aA1e0709
     address public link_token_contract =
-        0x5947BB275c521040051D82396192181b413227A3;
+        0x514910771AF9Ca656af840dff83E8264EcF986CA;
 
-    // testnet: 0x354d2f95da55398f44b7cff77da56283d9c6c829a4bdf1bbcaf2ad6a4d081f61
+    // testnet: 0xd89b2bf150e3b9e13446986e571fb9cab24b13cea0a43ea20a6049a85cc807cc
     bytes32 public keyHash =
-        0x83250c5584ffa93feb6ee082981c5ebe484c865196750b39835ad4f13780435d;
+        0x8af398995b04c28e9951adb9721ef74c74f93e6a478f39e7e0777be13527e7ef;
 
     uint32 public callbackGasLimit = 2500000;
     uint16 public requestConfirmations = 3;
