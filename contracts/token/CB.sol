@@ -483,6 +483,4 @@ contract CB is
 
         emit SpawnCns(requestIdToUser[requestId], randomWords.length, cnIds);
     }
-
-    receive() external payable {}
 }
