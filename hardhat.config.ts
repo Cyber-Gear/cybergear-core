@@ -28,14 +28,14 @@ const config: HardhatUserConfig = {
     hardhat: {},
     localhost: {},
     testnet: {
-      url: "https://rinkeby.infura.io/v3/",
+      url: "https://rinkeby.infura.io/v3/bf8dec918d984e83b993411ee2ab6f00",
       chainId: 4,
       gas: 2100000,
       gasPrice: 20000000000,
       accounts: [PRIVATE_KEY]
     },
     mainnet: {
-      url: "https://mainnet.infura.io/v3/",
+      url: "https://mainnet.infura.io/v3/bf8dec918d984e83b993411ee2ab6f00",
       chainId: 1,
       gas: 2100000,
       gasPrice: 20000000000,
