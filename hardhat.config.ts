@@ -28,17 +28,13 @@ const config: HardhatUserConfig = {
     hardhat: {},
     localhost: {},
     testnet: {
-      url: "https://rinkeby.infura.io/v3/bf8dec918d984e83b993411ee2ab6f00",
-      chainId: 4,
-      gas: 2100000,
-      gasPrice: 20000000000,
+      url: "https://eth-sepolia.g.alchemy.com/v2/cb_rZmR500cF6qRkHuPCnK53kD7KXt1u",
+      chainId: 11155111,
       accounts: [PRIVATE_KEY]
     },
     mainnet: {
-      url: "https://mainnet.infura.io/v3/bf8dec918d984e83b993411ee2ab6f00",
+      url: "https://eth-mainnet.g.alchemy.com/v2/Eewdxvru4MqDc5jLG9RS26v74957vGj_",
       chainId: 1,
-      gas: 2100000,
-      gasPrice: 20000000000,
       accounts: [PRIVATE_KEY]
     },
     coverage: {
